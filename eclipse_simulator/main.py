@@ -75,7 +75,7 @@ line_y, = ay.plot([], [], lw=2)
 line_z, = az.plot([], [], lw=2)
 line_S, = aS.plot([], [], lw=2)
 
-# 그래프 범위 설정
+#그래프 범위 설정
 ax.set_xlabel('Time (s)')
 ay.set_xlabel('Time (s)')
 az.set_xlabel('Time (s)')
@@ -99,13 +99,13 @@ scene.camera.axis = vector(1e11, -1e11, 0)  #카메라 시점 설정
 
 plt.show()
 
-# 정사영 구하기 
+#정사영 구하기 
 def project_to_2d(obj, camera_pos, camera_axis):
     to_object = obj.pos - camera_pos
     projection_plane = to_object - to_object.proj(camera_axis)
     return vector(projection_plane.x, projection_plane.y, 0), to_object.dot(camera_axis)
 
-# 가시 단면적 계산하기
+#단면적 계산하기
 def area(x1, y1, r1, x2, y2, r2):
     d = math.sqrt((x2 - x1)**2 + (y2 - y1)**2) 
     rr1 = r1**2
@@ -129,11 +129,11 @@ def area(x1, y1, r1, x2, y2, r2):
         visible_area = math.pi * rr1 - overlap_area
         return max(visible_area, 0) #값이 튀는 경우 0으로 처리함
 
-# 시뮬레이션 시작
+#시뮬레이션
 while True:
     rate(1000)  # 시뮬레이션 속도 (초당 1000번 반복)
 
-    # 중력 계산 및 위치 갱신
+    #중력,위치 계산
     r = planet.pos - star.pos
     distance = r.mag
     force = -G * star.mass * planet.mass / distance**2 * r.norm()
@@ -145,7 +145,7 @@ while True:
     planet_2d, planet_cam_dist = project_to_2d(planet, scene.camera.pos, scene.camera.axis)
     
     
-    #행성이 가려진 경우 예외처리
+    #행성이 가려진 경우
     if planet_cam_dist > star_cam_dist:
         result = math.pi * star.radius**2 
     else:
@@ -153,14 +153,14 @@ while True:
 
     elapsed_time = time.time() - firstTime
 
-    # 데이터 저장
+    #데이터 저장
     t_data.append(elapsed_time)
     x_data.append(planet.pos.x)
     y_data.append(planet.pos.y)
     z_data.append(planet.pos.z)
     S_data.append(result)
 
-    # 반응형 그래프 범위 업데이트
+    #반응형 그래프 범위 업데이트
     ax.set_xlim(min(t_data), max(t_data))
     ay.set_xlim(min(t_data), max(t_data))
     az.set_xlim(min(t_data), max(t_data))
@@ -170,12 +170,12 @@ while True:
     aS.set_xlim(min(t_data), max(t_data))
     aS.set_ylim(4, math.pi * star.radius**2) 
 
-    # 그래프 데이터 업데이트
+    #그래프 데이터 업데이트
     line_x.set_data(t_data, x_data)
     line_y.set_data(t_data, y_data)
     line_z.set_data(t_data, z_data)
     line_S.set_data(t_data, S_data)
 
-    # 그래프 그리기
+    #그래프 그리기
     plt.draw()
     plt.pause(0.01)
